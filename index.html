@@ -13,7 +13,6 @@
         .container { width: 95%; max-width: 900px; padding: 20px; text-align: center; }
         .hidden { display: none !important; }
         
-        /* --- Header con il tuo Adesivo --- */
         .header-container { 
             display: flex; 
             flex-direction: column; 
@@ -42,15 +41,12 @@
         .main-title { color: var(--primary); margin: 0; font-size: 1.8rem; }
         .author-tag { color: var(--secondary); font-weight: bold; font-size: 1.2rem; margin-top: 5px; }
 
-        /* Dashboard */
         .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
         .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; transition: 0.3s; border-bottom: 5px solid var(--primary); }
         .card:hover { transform: translateY(-5px); }
 
-        /* Game Box */
         .game-box { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); position: relative; min-height: 450px; }
         
-        /* Grafiche */
         .grid-decimi { display: flex; width: 300px; height: 50px; border: 2px solid #333; margin: 20px auto; }
         .cell-decimo { flex: 1; border: 1px solid #ccc; }
         .grid-centesimi { display: grid; grid-template-columns: repeat(10, 1fr); width: 220px; height: 220px; border: 2px solid #333; margin: 20px auto; gap: 1px; background: #333;}
@@ -63,14 +59,12 @@
         .filled-alt { background-color: var(--accent) !important; }
         .filled-milli { background-color: var(--milli) !important; }
 
-        /* Linea dei Numeri */
-        .line-container { width: 90%; height: 100px; margin: 50px auto; position: relative; border-top: 3px solid #333; }
-        .tick { position: absolute; width: 2px; height: 12px; background: #333; top: -1px; }
-        .tick.major { height: 22px; width: 3px; }
-        .tick-label { position: absolute; top: 25px; transform: translateX(-50%); font-weight: bold; }
-        .marker { position: absolute; width: 24px; height: 24px; background: var(--danger); border-radius: 50%; top: -13px; transform: translateX(-50%); cursor: grab; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3); z-index: 10; }
+        .line-container { width: 90%; height: 60px; margin: 50px auto; position: relative; border-top: 3px solid #333; }
+        .tick { position: absolute; width: 2px; height: 15px; background: #333; top: -1px; }
+        .tick.major { height: 25px; width: 3px; }
+        .tick-label { position: absolute; top: 30px; transform: translateX(-50%); font-weight: bold; font-size: 0.9rem; }
+        .marker { position: absolute; width: 24px; height: 24px; background: var(--danger); border-radius: 50%; top: -13px; transform: translateX(-50%); cursor: grab; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3); z-index: 10; transition: left 0.1s; }
 
-        /* UI */
         .input-area { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 20px; }
         input { width: 85px; padding: 10px; font-size: 1.2rem; text-align: center; border: 2px solid #ddd; border-radius: 8px; }
         .line { width: 60px; height: 2px; background: #333; margin: 5px 0; }
@@ -110,7 +104,7 @@
                     <input type="number" id="den-in" readonly>
                 </div>
                 <div style="font-size: 2rem;">=</div>
-                <input type="text" id="dec-in" placeholder="0,000" style="width: 110px;">
+                <input type="text" id="dec-in" placeholder="0,0" style="width: 110px;">
             </div>
 
             <div id="feedback" style="margin-top: 20px; font-weight: bold;"></div>
@@ -120,7 +114,7 @@
     </div>
 
     <script>
-        let mode = 0; let target = 0; let currentPos = 0;
+        let mode = 0; let target = 0;
 
         function startApp(m) {
             mode = m;
@@ -134,9 +128,11 @@
             const inputUI = document.getElementById('input-ui');
             const feedback = document.getElementById('feedback');
             area.innerHTML = ''; feedback.innerHTML = '';
-            document.getElementById('num-in').value = ''; document.getElementById('dec-in').value = '';
+            document.getElementById('num-in').value = ''; 
+            document.getElementById('dec-in').value = '';
             document.getElementById('next-btn').classList.add('hidden');
             document.getElementById('check-btn').classList.remove('hidden');
+            inputUI.classList.remove('hidden');
 
             if (mode === 1) {
                 target = Math.floor(Math.random() * 9) + 1;
@@ -165,16 +161,19 @@
                 area.innerHTML = html + '</div>';
             } else {
                 inputUI.classList.add('hidden');
-                document.getElementById('title').innerText = "Trascina sulla posizione corretta";
-                target = (Math.floor(Math.random() * 11) + 30) / 10;
-                area.innerHTML = `<p style='font-size:1.5rem'>Trova: <b>${target.toFixed(1).replace('.',',')}</b></p><div class="line-container" id="line">`;
-                let line = document.getElementById('line');
-                for(let i=30; i<=40; i++) {
-                    let pos = (i-30)*10;
-                    area.innerHTML += `<div class="tick ${i%10===0?'major':''}" style="left:${pos}%"></div>`;
-                    if(i%5===0) area.innerHTML += `<div class="tick-label" style="left:${pos}%">${(i/10).toFixed(1)}</div>`;
+                document.getElementById('title').innerText = "Trascina il pallino rosso";
+                target = (Math.floor(Math.random() * 11) + 30) / 10; // Da 3,0 a 4,0
+                
+                let lineHTML = `<p style='font-size:1.5rem'>Trova: <b>${target.toFixed(1).replace('.',',')}</b></p>`;
+                lineHTML += `<div class="line-container" id="line">`;
+                for(let i=0; i<=10; i++) {
+                    let pos = i * 10;
+                    let label = (3 + i/10).toFixed(1).replace('.',',');
+                    lineHTML += `<div class="tick major" style="left:${pos}%"></div>`;
+                    lineHTML += `<div class="tick-label" style="left:${pos}%">${label}</div>`;
                 }
-                area.innerHTML += '<div class="marker" id="marker" style="left:0%"></div></div>';
+                lineHTML += `<div class="marker" id="marker" style="left:0%"></div></div>`;
+                area.innerHTML = lineHTML;
                 setupDrag();
             }
         }
@@ -183,15 +182,18 @@
             const marker = document.getElementById('marker');
             const line = document.getElementById('line');
             let isDragging = false;
+
             const move = (e) => {
                 if(!isDragging) return;
-                let x = (e.touches ? e.touches[0].clientX : e.clientX) - line.getBoundingClientRect().left;
-                let pct = Math.max(0, Math.min(100, (x / line.offsetWidth) * 100));
+                let rect = line.getBoundingClientRect();
+                let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                let x = clientX - rect.left;
+                let pct = Math.max(0, Math.min(100, (x / rect.width) * 100));
                 let snapPct = Math.round(pct / 10) * 10;
                 marker.style.left = snapPct + '%';
-                currentPos = 3 + (snapPct / 10);
             };
-            marker.onmousedown = marker.ontouchstart = (e) => { isDragging = true; };
+
+            marker.onmousedown = marker.ontouchstart = (e) => { isDragging = true; e.preventDefault(); };
             window.onmousemove = window.ontouchmove = move;
             window.onmouseup = window.ontouchend = () => isDragging = false;
         }
@@ -200,12 +202,13 @@
             const f = document.getElementById('feedback');
             let ok = false;
             if(mode === 4) {
-                ok = Math.abs((3 + (parseInt(document.getElementById('marker').style.left)/10)) - target) < 0.1;
+                let currentPos = 3 + (parseInt(document.getElementById('marker').style.left) / 10);
+                ok = Math.abs(currentPos - target) < 0.01;
             } else {
                 const num = parseInt(document.getElementById('num-in').value);
                 const dec = document.getElementById('dec-in').value.replace(',', '.');
                 let correctDec = (target / document.getElementById('den-in').value);
-                ok = (num === target && parseFloat(dec) === correctDec);
+                ok = (num === target && Math.abs(parseFloat(dec) - correctDec) < 0.0001);
             }
             if(ok) {
                 f.innerHTML = "🌟 Bravissimo!"; f.style.color = "var(--success)";
